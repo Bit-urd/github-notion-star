@@ -125,9 +125,9 @@ export class Github {
     private async getUserRepoAfterCursor(cursor: string) {
         const data = await this.client.graphql<{ viewer: Repo }>(
             `
-query ($after: String) {
+query ($after: String,$first: Int) {
   viewer {
-    repositories(after: $after) {
+    repositories(after: $after,first: $first) {
       pageInfo {
         hasNextPage
         endCursor
@@ -156,7 +156,8 @@ query ($after: String) {
 }
         `,
             {
-                after: cursor
+                after: cursor,
+                first: 100
             },
         );
         console.log(`my repo : \n ${JSON.stringify(data, null, 2)}`);
