@@ -37,7 +37,11 @@ async function partialSync() {
             console.log(`Skip saved page ${repo.nameWithOwner}`);
             continue;
         }
-        await notion.insertPage(repo, 'My');
+        let repoType = 'My';
+        if (repo.isFork) {
+            repoType = 'Fork';
+        }
+        await notion.insertPage(repo, repoType);
     }
 }
 
