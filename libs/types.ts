@@ -4,11 +4,11 @@ export interface RepositoryTopic extends SelectOptionWithName {
     name: string;
 }
 
-export interface GithubRepositoryTopic  {
+export interface GithubRepositoryTopic {
     topic: RepositoryTopic;
 }
 
-export interface GithubRepositoryTopicConnection  {
+export interface GithubRepositoryTopicConnection {
     nodes: GithubRepositoryTopic[];
 }
 
