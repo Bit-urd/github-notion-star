@@ -75,6 +75,9 @@ export class Github {
     private transformGithubRepoResponse(data: QueryForUserRepository): Repo[] {
         return (data.repositories.edges || []).map(({ node }) => ({
             ...node,
+            repositoryTopics: (node?.repositoryTopics || []).map(
+                (o: RepositoryTopic): RepositoryTopic => ({ name: o?.name })
+            ),
         }))
     }
 
