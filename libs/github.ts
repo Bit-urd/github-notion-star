@@ -145,6 +145,7 @@ export class Github {
             {
                 after: cursor,
                 topicFirst: topicFirst,
+                first: 1000,  
             },
         );
     
