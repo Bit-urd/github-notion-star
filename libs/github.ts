@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/core';
-import { QueryForStarredRepository, Repo, GithubRepositoryTopic, RepositoryTopic } from './types';
+import { QueryForStarredRepository,QueryForUserRepository, Repo, GithubRepositoryTopic, RepositoryTopic } from './types';
 
 // @ts-ignore
 const githubTopicsFirst = +process.env.REPO_TOPICS_LIMIT || 50;
@@ -32,17 +32,17 @@ export class Github {
             hasNextPage = data.starredRepositories.pageInfo.hasNextPage;
             cursor = data.starredRepositories.pageInfo.endCursor;
         }
-        const data = await this.getLastUserRepo(100);
-        this.myRepoList.push(
-            data,
-        );
-        // cursor = '';
-        // hasNextPage = true;
-        // while (hasNextPage && this.myRepoList.length < limit) {
-            
-        //     hasNextPage = data.starredRepositories.pageInfo.hasNextPage;
-        //     cursor = data.starredRepositories.pageInfo.endCursor;
-        // }
+
+        cursor = '';
+        hasNextPage = true;
+        while (hasNextPage && this.myRepoList.length < limit) {
+            const data = await this.getUserRepoAfterCursor(cursor);
+            this.myRepoList.push(
+                ...this.transformGithubRepoResponse(data),
+            );
+            hasNextPage = data.repositories.pageInfo.hasNextPage;
+            cursor = data.repositories.pageInfo.endCursor;
+        }
 
         console.log(`Github: Get all starred repos success, count is ${this.repoList.length}`);
         console.log(`Github: Get all my repos success, count is ${this.myRepoList.length}`);
@@ -72,14 +72,11 @@ export class Github {
             ),
         }))
     }
-    // private transformGithubRepoResponse(data: QueryForUserRepository): Repo[] {
-    //     return (data.repositories.edges || []).map(({ node }) => ({
-    //         ...node,
-    //         repositoryTopics: (node?.repositoryTopics?.nodes || []).map(
-    //             (o: GithubRepositoryTopic): RepositoryTopic => ({ name: o?.topic?.name })
-    //         ),
-    //     }))
-    // }
+    private transformGithubRepoResponse(data: QueryForUserRepository): Repo[] {
+        return (data.repositories.edges || []).map(({ node }) => ({
+            ...node,
+        }))
+    }
 
     private async getStarredRepoAfterCursor(cursor: string, topicFirst: number) {
         const data = await this.client.graphql<{ viewer: QueryForStarredRepository }>(
@@ -123,9 +120,9 @@ export class Github {
 
         return data.viewer;
     }
-
+// https://docs.github.com/zh/graphql/reference/objects#repositoryconnection
     private async getUserRepoAfterCursor(cursor: string) {
-        const data = await this.client.graphql<{ viewer: Repo }>(
+        const data = await this.client.graphql<{ viewer: QueryForUserRepository }>(
             `
 query ($after: String,$first: Int) {
   viewer {

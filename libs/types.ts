@@ -46,7 +46,19 @@ export interface QueryForStarredRepository {
         }>;
     };
 }
-
+// https://docs.github.com/zh/graphql/reference/objects#repositoryconnection
+export interface QueryForUserRepository {
+    repositories: {
+        pageInfo: {
+            startCursor: string;
+            endCursor: string;
+            hasNextPage: boolean;
+        };
+        edges: Array<{
+            node: Repo;
+        }>;
+    };
+}
 
 export interface NotionPage extends Page {
     properties: {
