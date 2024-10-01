@@ -124,35 +124,28 @@ export class Github {
     private async getUserRepoAfterCursor(cursor: string) {
         const data = await this.client.graphql<{ viewer: Repo }>(
             `
-            query ($after: String) {
-                viewer {
-                    repositories(last: $last, isFork: false, privacy: PUBLIC) {
-                        pageInfo {
-                            startCursor
-                            endCursor
-                            hasNextPage
-                        }
-                        edges {
-                            node {
-                                nameWithOwner
-                                url
-                                description
-                                primaryLanguage {
-                                    name
-                                }
-                                repositoryTopics(first: $topicFirst) {
-                                    nodes {
-                                        topic {
-                                            name
-                                        }
-                                    }
-                                }
-                                updatedAt
-                            }
-                        }
-                    }
-                }
-            }
+query ( $after: String) {
+  viewer {
+    repositories(after: $after) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        node {
+          nameWithOwner
+          url
+          description
+          isFork
+          primaryLanguage {
+            name
+          }
+          updatedAt
+        }
+      }
+    }
+  }
+}
         `,
             {
                 after: cursor
