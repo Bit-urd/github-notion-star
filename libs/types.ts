@@ -21,6 +21,7 @@ export interface RepoBase {
     url: string;
     description: string;
     starredAt: string;
+    isFork: boolean;
     primaryLanguage: Language;
     updatedAt: string;
 }

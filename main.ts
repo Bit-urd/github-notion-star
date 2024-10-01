@@ -12,7 +12,11 @@ async function fullSync() {
 
     for (const repo of github.myRepoList.reverse()) {
         if (!notion.hasPage(repo.nameWithOwner)) {
-            await notion.insertPage(repo,'My');
+            let repoType = 'My';
+            if (repo.isFork) {
+                repoType = 'Fork';
+            }
+            await notion.insertPage(repo, repoType);
         }
     }
 }
@@ -25,7 +29,7 @@ async function partialSync() {
             console.log(`Skip saved page ${repo.nameWithOwner}`);
             continue;
         }
-        await notion.insertPage(repo,'Star');
+        await notion.insertPage(repo, 'Star');
     }
 
     for (const repo of github.myRepoList.reverse()) {
@@ -33,7 +37,7 @@ async function partialSync() {
             console.log(`Skip saved page ${repo.nameWithOwner}`);
             continue;
         }
-        await notion.insertPage(repo,'My');
+        await notion.insertPage(repo, 'My');
     }
 }
 

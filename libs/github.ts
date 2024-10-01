@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/core';
-import { QueryForStarredRepository,QueryForUserRepository, Repo, GithubRepositoryTopic, RepositoryTopic } from './types';
+import { QueryForStarredRepository, QueryForUserRepository, Repo, GithubRepositoryTopic, RepositoryTopic } from './types';
 
 // @ts-ignore
 const githubTopicsFirst = +process.env.REPO_TOPICS_LIMIT || 50;
@@ -53,14 +53,20 @@ export class Github {
         const limit = +process.env.PARTIALSYNC_LIMIT || 10;
 
         console.log(`Github: Start to sync latest starred repos, limit is ${limit}`);
-
         const data = await this.getLastStarredRepo(limit, githubTopicsFirst);
         const myRepoData = await this.getLastUserRepo(limit);
+        console.log(`data: ${JSON.stringify(data, null, 2)}`);
+        console.log(`myRepoData: ${JSON.stringify(myRepoData, null, 2)}`);
 
         this.repoList.push(
             ...this.transformGithubStarResponse(data),
-            myRepoData,
         );
+        console.log(`this.repoList: ${JSON.stringify(this.repoList, null, 2)}`);
+
+        this.myRepoList.push(
+            ...this.transformGithubRepoResponse(myRepoData),
+        );
+        console.log(`this.myRepoList: ${JSON.stringify(this.myRepoList, null, 2)}`);
     }
 
     private transformGithubStarResponse(data: QueryForStarredRepository): Repo[] {
@@ -124,7 +130,7 @@ export class Github {
 
         return data.viewer;
     }
-// https://docs.github.com/zh/graphql/reference/objects#repositoryconnection
+    // https://docs.github.com/zh/graphql/reference/objects#repositoryconnection
     private async getUserRepoAfterCursor(cursor: string) {
         const data = await this.client.graphql<{ viewer: QueryForUserRepository }>(
             `
@@ -215,7 +221,7 @@ query ($after: String,$first: Int) {
     }
 
     private async getLastUserRepo(first: number) {
-        const data = await this.client.graphql<{ viewer: Repo }>(
+        const data = await this.client.graphql<{ viewer: QueryForUserRepository }>(
             `
 query ( $first: Int) {
   viewer {
@@ -244,7 +250,7 @@ query ( $first: Int) {
                 first: first,
             },
         );
-    
+
         return data.viewer;
     }
 }
