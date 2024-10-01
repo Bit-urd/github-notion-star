@@ -14,6 +14,7 @@ export class Github {
     }
 
     repoList: Repo[] = [];
+    myRepoList: Repo[] = [];
 
     async fullSync() {
         // @ts-ignore
@@ -104,6 +105,48 @@ export class Github {
         return data.viewer;
     }
 
+    private async getUserRepoAfterCursor(cursor: string, topicFirst: number) {
+        const data = await this.client.graphql<{ viewer: QueryForStarredRepository }>(
+            `
+                query ($after: String, $topicFirst: Int) {
+                    viewer {
+                        repositories(after: $after, isFork: false, privacy: PUBLIC) {
+                            pageInfo {
+                                startCursor
+                                endCursor
+                                hasNextPage
+                            }
+                            edges {
+                                node {
+                                    nameWithOwner
+                                    url
+                                    description
+                                    primaryLanguage {
+                                        name
+                                    }
+                                    repositoryTopics(first: $topicFirst) {
+                                        nodes {
+                                            topic {
+                                                name
+                                            }
+                                        }
+                                    }
+                                    updatedAt
+                                }
+                            }
+                        }
+                    }
+                }
+            `,
+            {
+                after: cursor,
+                topicFirst: topicFirst,
+            },
+        );
+    
+        return data.viewer;
+    }
+
     private async getLastStarredRepo(last: number, topicFirst: number) {
         const data = await this.client.graphql<{ viewer: QueryForStarredRepository }>(
             `
@@ -149,6 +192,48 @@ export class Github {
             },
         );
 
+        return data.viewer;
+    }
+
+    private async getLastUserRepo(last: number, topicFirst: number) {
+        const data = await this.client.graphql<{ viewer: QueryForStarredRepository }>(
+            `
+                query ($last: Int, $topicFirst: Int) {
+                    viewer {
+                        repositories(last: $last, isFork: false, privacy: PUBLIC) {
+                            pageInfo {
+                                startCursor
+                                endCursor
+                                hasNextPage
+                            }
+                            edges {
+                                node {
+                                    nameWithOwner
+                                    url
+                                    description
+                                    primaryLanguage {
+                                        name
+                                    }
+                                    repositoryTopics(first: $topicFirst) {
+                                        nodes {
+                                            topic {
+                                                name
+                                            }
+                                        }
+                                    }
+                                    updatedAt
+                                }
+                            }
+                        }
+                    }
+                }
+            `,
+            {
+                last: last,
+                topicFirst: topicFirst,
+            },
+        );
+    
         return data.viewer;
     }
 }

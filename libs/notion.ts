@@ -73,7 +73,7 @@ export class Notion {
         this.save();
     }
 
-    async insertPage(repo: Repo) {
+    async insertPage(repo: Repo,repoType: string) {
         if (repo.description && repo.description.length >= 2000) {
             repo.description = repo.description.substr(0, 120) + '...'
         }
@@ -96,7 +96,7 @@ export class Notion {
                 Type: {
                     type: 'select',
                     select: {
-                        name: 'Star',
+                        name: repoType,
                     },
                 },
                 Link: {
