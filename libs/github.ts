@@ -15,7 +15,6 @@ export class Github {
 
     repoList: Repo[] = [];
     myRepoList: Repo[] = [];
-
     async fullSync() {
         // @ts-ignore
         const limit = +process.env.FULLSYNC_LIMIT || 2000;
@@ -23,22 +22,27 @@ export class Github {
 
         let cursor = '';
         let hasNextPage = true;
-        const repoList = [];
+        // const repoList = [];
 
-        while (hasNextPage && repoList.length < limit) {
+        while (hasNextPage && this.repoList.length < limit) {
             const data = await this.getStarredRepoAfterCursor(cursor, githubTopicsFirst);
-            const myRepoData = await this.getUserRepoAfterCursor(cursor, githubTopicsFirst);
-            repoList.push(
+            this.repoList.push(
                 ...this.transformGithubStarResponse(data),
-                ...this.transformGithubStarResponse(myRepoData),
             );
             hasNextPage = data.starredRepositories.pageInfo.hasNextPage;
             cursor = data.starredRepositories.pageInfo.endCursor;
         }
 
-        this.repoList = repoList;
+        cursor = '';
+        while (hasNextPage && this.myRepoList.length < limit) {
+            const data = await this.getUserRepoAfterCursor(cursor);
+            this.myRepoList.push(
+                data,
+            );
+        }
 
         console.log(`Github: Get all starred repos success, count is ${this.repoList.length}`);
+        console.log(`Github: Get all my repos success, count is ${this.myRepoList.length}`);
     }
 
     async getList() {
@@ -48,11 +52,11 @@ export class Github {
         console.log(`Github: Start to sync latest starred repos, limit is ${limit}`);
 
         const data = await this.getLastStarredRepo(limit, githubTopicsFirst);
-        const myRepoData = await this.getLastUserRepo(limit, githubTopicsFirst);
+        const myRepoData = await this.getLastUserRepo(limit);
 
         this.repoList.push(
             ...this.transformGithubStarResponse(data),
-            ...this.transformGithubStarResponse(myRepoData),
+            myRepoData,
         );
     }
 
@@ -65,6 +69,14 @@ export class Github {
             ),
         }))
     }
+    // private transformGithubRepoResponse(data: QueryForUserRepository): Repo[] {
+    //     return (data.repositories.edges || []).map(({ node }) => ({
+    //         ...node,
+    //         repositoryTopics: (node?.repositoryTopics?.nodes || []).map(
+    //             (o: GithubRepositoryTopic): RepositoryTopic => ({ name: o?.topic?.name })
+    //         ),
+    //     }))
+    // }
 
     private async getStarredRepoAfterCursor(cursor: string, topicFirst: number) {
         const data = await this.client.graphql<{ viewer: QueryForStarredRepository }>(
@@ -109,42 +121,41 @@ export class Github {
         return data.viewer;
     }
 
-    private async getUserRepoAfterCursor(cursor: string, topicFirst: number) {
-        const data = await this.client.graphql<{ viewer: QueryForStarredRepository }>(
+    private async getUserRepoAfterCursor(cursor: string) {
+        const data = await this.client.graphql<{ viewer: Repo }>(
             `
-                query ($after: String, $topicFirst: Int) {
-                    viewer {
-                        repositories(after: $after, first: 100, isFork: false, privacy: PUBLIC) {
-                            pageInfo {
-                                startCursor
-                                endCursor
-                                hasNextPage
-                            }
-                            edges {
-                                node {
-                                    nameWithOwner
-                                    url
-                                    description
-                                    primaryLanguage {
-                                        name
-                                    }
-                                    repositoryTopics(first: $topicFirst) {
-                                        nodes {
-                                            topic {
-                                                name
-                                            }
+            query ($after: String) {
+                viewer {
+                    repositories(last: $last, isFork: false, privacy: PUBLIC) {
+                        pageInfo {
+                            startCursor
+                            endCursor
+                            hasNextPage
+                        }
+                        edges {
+                            node {
+                                nameWithOwner
+                                url
+                                description
+                                primaryLanguage {
+                                    name
+                                }
+                                repositoryTopics(first: $topicFirst) {
+                                    nodes {
+                                        topic {
+                                            name
                                         }
                                     }
-                                    updatedAt
                                 }
+                                updatedAt
                             }
                         }
                     }
                 }
-            `,
+            }
+        `,
             {
-                after: cursor,
-                topicFirst: topicFirst
+                after: cursor
             },
         );
     
@@ -199,42 +210,34 @@ export class Github {
         return data.viewer;
     }
 
-    private async getLastUserRepo(last: number, topicFirst: number) {
-        const data = await this.client.graphql<{ viewer: QueryForStarredRepository }>(
+    private async getLastUserRepo(first: number) {
+        const data = await this.client.graphql<{ viewer: Repo }>(
             `
-                query ($last: Int, $topicFirst: Int) {
-                    viewer {
-                        repositories(last: $last, isFork: false, privacy: PUBLIC) {
-                            pageInfo {
-                                startCursor
-                                endCursor
-                                hasNextPage
-                            }
-                            edges {
-                                node {
-                                    nameWithOwner
-                                    url
-                                    description
-                                    primaryLanguage {
-                                        name
-                                    }
-                                    repositoryTopics(first: $topicFirst) {
-                                        nodes {
-                                            topic {
-                                                name
-                                            }
-                                        }
-                                    }
-                                    updatedAt
-                                }
-                            }
-                        }
-                    }
-                }
+query ( $first: Int) {
+  viewer {
+    repositories(first: $first) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        node {
+          nameWithOwner
+          url
+          description
+          isFork
+          primaryLanguage {
+            name
+          }
+          updatedAt
+        }
+      }
+    }
+  }
+}
             `,
             {
-                last: last,
-                topicFirst: topicFirst,
+                first: 100,
             },
         );
     

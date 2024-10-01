@@ -5,13 +5,13 @@ import assert from 'assert';
 async function fullSync() {
     await Promise.all([github.fullSync(), notion.fullSyncIfNeeded()]);
 
-    for (const repo of github.repoList) {
+    for (const repo of github.repoList.reverse()) {
         if (!notion.hasPage(repo.nameWithOwner)) {
             await notion.insertPage(repo, 'Star');
         }
     }
 
-    for (const repo of github.myRepoList) {
+    for (const repo of github.repoList.reverse()) {
         if (!notion.hasPage(repo.nameWithOwner)) {
             await notion.insertPage(repo,'My');
         }
@@ -26,7 +26,6 @@ async function partialSync() {
             console.log(`Skip saved page ${repo.nameWithOwner}`);
             continue;
         }
-
         await notion.insertPage(repo,'Star');
     }
 
@@ -35,10 +34,12 @@ async function partialSync() {
             console.log(`Skip saved page ${repo.nameWithOwner}`);
             continue;
         }
-
         await notion.insertPage(repo,'My');
     }
 }
+
+// fullSync();
+// partialSync();
 
 const ENVS = ['NOTION_API_KEY', 'NOTION_DATABASE_ID', 'TOKEN_OF_GITHUB'];
 

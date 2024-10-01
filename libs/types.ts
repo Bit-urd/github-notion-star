@@ -47,6 +47,7 @@ export interface QueryForStarredRepository {
     };
 }
 
+
 export interface NotionPage extends Page {
     properties: {
         Name: TitlePropertyValue;
