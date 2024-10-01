@@ -128,8 +128,8 @@ export class Notion {
                 'Starred At': {
                     type: 'date',
                     date: {
-                        start: repo.starredAt || new Date().toISOString(),
-                        end: repo.starredAt || new Date().toISOString(),
+                        start: repo.starredAt || repo.updatedAt,
+                        end: repo.starredAt || repo.updatedAt,
                     },
                 },
             },
