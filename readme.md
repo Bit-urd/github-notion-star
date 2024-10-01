@@ -55,3 +55,8 @@
 
 1. （可选）当前默认的轮询时间是十分钟。如果你想要修改增量同步轮询的时间，需要修改 `.github/workflows/partial-sync.yml`，在 `on.schedule.cron` 里面设置你的轮询时间。
 2. 在 Github Actions 里面开启 `Partial Sync Notion Star` （对于 Fork 的 repo，会自动禁用所有轮询的 Actions，所以需要手动开启）
+
+
+
+https://docs.github.com/en/graphql/overview/explorer
+https://docs.github.com/zh/graphql/reference/objects#orgoauthappaccessblockedauditentry
