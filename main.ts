@@ -4,7 +4,6 @@ import assert from 'assert';
 
 async function fullSync() {
     await Promise.all([github.fullSync(), notion.fullSyncIfNeeded()]);
-
     for (const repo of github.repoList.reverse()) {
         if (!notion.hasPage(repo.nameWithOwner)) {
             await notion.insertPage(repo, 'Star');
