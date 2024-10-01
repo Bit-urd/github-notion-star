@@ -77,6 +77,7 @@ export class Notion {
         if (repo.description && repo.description.length >= 2000) {
             repo.description = repo.description.substr(0, 120) + '...'
         }
+        console.log(`repo print: \n ${JSON.stringify(repo, null, 2)}`)
         const data = await this.notion.pages.create({
             parent: {
                 database_id: databaseId,
