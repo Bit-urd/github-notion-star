@@ -77,7 +77,7 @@ export class Github {
             console.error('repositories.edges is not an array:', data.repositories.edges);
             return [];
         }
-    
+        console.log(`node: ${data},edges val: ${JSON.stringify(data.repositories.edges, null, 2)}`)
         return (data.repositories.edges || []).map(({ node }) => ({
             ...node,
             repositoryTopics: (node?.repositoryTopics || []).map(
