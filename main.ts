@@ -11,7 +11,7 @@ async function fullSync() {
         }
     }
 
-    for (const repo of github.repoList.reverse()) {
+    for (const repo of github.myRepoList.reverse()) {
         if (!notion.hasPage(repo.nameWithOwner)) {
             await notion.insertPage(repo,'My');
         }

@@ -32,15 +32,17 @@ export class Github {
             hasNextPage = data.starredRepositories.pageInfo.hasNextPage;
             cursor = data.starredRepositories.pageInfo.endCursor;
         }
-
-        cursor = '';
-        hasNextPage = true;
-        while (hasNextPage && this.myRepoList.length < limit) {
-            const data = await this.getUserRepoAfterCursor(cursor);
-            this.myRepoList.push(
-                data,
-            );
-        }
+        const data = await this.getLastUserRepo(100);
+        this.myRepoList.push(
+            data,
+        );
+        // cursor = '';
+        // hasNextPage = true;
+        // while (hasNextPage && this.myRepoList.length < limit) {
+            
+        //     hasNextPage = data.starredRepositories.pageInfo.hasNextPage;
+        //     cursor = data.starredRepositories.pageInfo.endCursor;
+        // }
 
         console.log(`Github: Get all starred repos success, count is ${this.repoList.length}`);
         console.log(`Github: Get all my repos success, count is ${this.myRepoList.length}`);
@@ -160,7 +162,6 @@ query ($after: String,$first: Int) {
                 first: 100
             },
         );
-        console.log(`my repo : \n ${JSON.stringify(data, null, 2)}`);
         return data.viewer;
     }
 
@@ -239,7 +240,7 @@ query ( $first: Int) {
 }
             `,
             {
-                first: 100,
+                first: first,
             },
         );
     
