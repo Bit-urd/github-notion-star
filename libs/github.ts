@@ -114,7 +114,7 @@ export class Github {
             `
                 query ($after: String, $topicFirst: Int) {
                     viewer {
-                        repositories(after: $after, isFork: false, privacy: PUBLIC) {
+                        repositories(after: $after, first: $first, isFork: false, privacy: PUBLIC) {
                             pageInfo {
                                 startCursor
                                 endCursor
