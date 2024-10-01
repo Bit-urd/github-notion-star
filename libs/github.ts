@@ -220,12 +220,12 @@ query ($after: String,$first: Int) {
         return data.viewer;
     }
 
-    private async getLastUserRepo(first: number) {
+    private async getLastUserRepo(last: number) {
         const data = await this.client.graphql<{ viewer: QueryForUserRepository }>(
             `
-query ( $first: Int) {
+query ( $last: Int) {
   viewer {
-    repositories(first: $first) {
+    repositories(last: $last) {
       pageInfo {
         hasNextPage
         endCursor
@@ -247,7 +247,7 @@ query ( $first: Int) {
 }
             `,
             {
-                first: first,
+                last: last,
             },
         );
 
