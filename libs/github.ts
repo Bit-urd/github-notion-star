@@ -27,10 +27,11 @@ export class Github {
 
         while (hasNextPage && repoList.length < limit) {
             const data = await this.getStarredRepoAfterCursor(cursor, githubTopicsFirst);
+            const myRepoData = await this.getStarredRepoAfterCursor(cursor, githubTopicsFirst);
             repoList.push(
                 ...this.transformGithubStarResponse(data),
+                ...this.transformGithubStarResponse(myRepoData),
             );
-
             hasNextPage = data.starredRepositories.pageInfo.hasNextPage;
             cursor = data.starredRepositories.pageInfo.endCursor;
         }
@@ -47,8 +48,11 @@ export class Github {
         console.log(`Github: Start to sync latest starred repos, limit is ${limit}`);
 
         const data = await this.getLastStarredRepo(limit, githubTopicsFirst);
+        const myRepoData = await this.getLastStarredRepo(limit, githubTopicsFirst);
+
         this.repoList.push(
             ...this.transformGithubStarResponse(data),
+            ...this.transformGithubStarResponse(myRepoData),
         );
     }
 
