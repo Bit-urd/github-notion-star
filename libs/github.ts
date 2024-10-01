@@ -34,6 +34,7 @@ export class Github {
         }
 
         cursor = '';
+        hasNextPage = true;
         while (hasNextPage && this.myRepoList.length < limit) {
             const data = await this.getUserRepoAfterCursor(cursor);
             this.myRepoList.push(
@@ -158,7 +159,7 @@ query ($after: String) {
                 after: cursor
             },
         );
-        console.log(JSON.stringify(data, null, 2));
+        console.log(`my repo : \n ${JSON.stringify(data, null, 2)}`);
         return data.viewer;
     }
 
