@@ -121,10 +121,10 @@ export class Notion {
                         name: repo?.primaryLanguage?.name || 'null',
                     },
                 },
-                'Repository Topics': {
-                    type: 'multi_select',
-                    multi_select: repo.repositoryTopics||[],
-                },
+                // 'Repository Topics': {
+                //     type: 'multi_select',
+                //     multi_select: repo.repositoryTopics||[],
+                // },
                 'Starred At': {
                     type: 'date',
                     date: {
