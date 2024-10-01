@@ -114,7 +114,7 @@ export class Github {
             `
                 query ($after: String, $topicFirst: Int) {
                     viewer {
-                        repositories(after: $after, first: $first, isFork: false, privacy: PUBLIC) {
+                        repositories(after: $after, first: 1000, isFork: false, privacy: PUBLIC) {
                             pageInfo {
                                 startCursor
                                 endCursor
@@ -144,8 +144,7 @@ export class Github {
             `,
             {
                 after: cursor,
-                topicFirst: topicFirst,
-                first: 1000,  
+                topicFirst: topicFirst
             },
         );
     
