@@ -72,17 +72,13 @@ export class Github {
             ),
         }))
     }
+
     private transformGithubRepoResponse(data: QueryForUserRepository): Repo[] {
-        if (!Array.isArray(data.repositories.edges)) {
-            console.error('repositories.edges is not an array:', data.repositories.edges);
-            return [];
-        }
-        console.log(`node: ${data},edges val: ${JSON.stringify(data.repositories.edges, null, 2)}`)
         return (data.repositories.edges || []).map(({ node }) => ({
             ...node,
-            // repositoryTopics: (node?.repositoryTopics || []).map(
-            //     (o: RepositoryTopic): RepositoryTopic => ({ name: o?.name })
-            // )
+            repositoryTopics: (node?.repositoryTopics?.nodes || []).map(
+                (o: GithubRepositoryTopic): RepositoryTopic => ({ name: o?.topic?.name })
+            ),
         }));
     }
 

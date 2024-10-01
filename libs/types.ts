@@ -55,7 +55,7 @@ export interface QueryForUserRepository {
             hasNextPage: boolean;
         };
         edges: Array<{
-            node: Repo;
+            node: GithubStarRepoNode;
         }>;
     };
 }
