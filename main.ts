@@ -7,13 +7,13 @@ async function fullSync() {
 
     for (const repo of github.repoList) {
         if (!notion.hasPage(repo.nameWithOwner)) {
-            await notion.insertPage(repo);
+            await notion.insertPage(repo, 'Star');
         }
     }
 
     for (const repo of github.myRepoList) {
         if (!notion.hasPage(repo.nameWithOwner)) {
-            await notion.insertPage(repo);
+            await notion.insertPage(repo,'My');
         }
     }
 }
