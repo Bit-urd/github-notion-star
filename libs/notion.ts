@@ -65,11 +65,16 @@ export class Notion {
 
     addPages(pages: NotionPage[]) {
         pages.forEach((page) => {
-            this.pages[page.properties.Name.title[0].plain_text] = {
-                id: page.id,
-            };
+            const nameProperty = page?.properties?.Name?.title;
+            if (nameProperty && nameProperty.length > 0) {
+                this.pages[nameProperty[0].plain_text] = {
+                    id: page.id,
+                };
+            } else {
+                console.warn(`Page ${page.id} does not have a valid name`);
+            }
         });
-
+    
         this.save();
     }
 
